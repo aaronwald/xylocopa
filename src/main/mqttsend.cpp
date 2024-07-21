@@ -1,6 +1,8 @@
 #include <iostream>
 #include <thread>
 #include <unistd.h>
+#include <sstream>
+#include <time.h>
 #include "mosquitto.h"
 #include "mqtt.h"
 
@@ -25,6 +27,7 @@ int main(int argc, char **argv)
 {
   int major, minor, revision;
   struct mosquitto *mosq = NULL;
+  std::stringstream ss;
 
   int opt;
   std::string hostname;
@@ -93,11 +96,16 @@ int main(int argc, char **argv)
   mosquitto_publish_callback_set(mosq, on_publish);
   mosquitto_connect_callback_set(mosq, on_connect);
 
-  std::string msg("{\"time\": \"99\"}");
+  ss << "{" << "\"time\": \"" << time(nullptr) << "\"}";
 
-  int mid = 99;
-  mosquitto_publish(
-      mosq, &mid, "foo/bar", msg.length(), msg.c_str(), 0, false);
+  int mid = -1;
+  if (mosquitto_publish(mosq, &mid, "foo/bar", ss.str().length(), ss.str().c_str(), 0, false) != MOSQ_ERR_SUCCESS) 
+  {
+    std::cerr << "Publish failed" << std::endl;
+  } else {
+    std::cerr << "Publishded message id: " << mid << std::endl;
+  }
+   
   mosq_cleanup(mosq);
 
   return 0;
