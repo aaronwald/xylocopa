@@ -93,11 +93,11 @@ int main(int argc, char **argv)
   mosquitto_publish_callback_set(mosq, on_publish);
   mosquitto_connect_callback_set(mosq, on_connect);
 
-std::string msg("{\"time\": \"99\"}");
+  std::string msg("{\"time\": \"99\"}");
 
-    int mid = 99;
-    mosquitto_publish(
-        mosq, &mid, "foo/bar", msg.length(), msg.c_str(), 0, false);
+  int mid = 99;
+  mosquitto_publish(
+      mosq, &mid, "foo/bar", msg.length(), msg.c_str(), 0, false);
   mosq_cleanup(mosq);
 
   return 0;
