@@ -8,6 +8,19 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 include(FetchContent)
 
+# BEGIN rapidjson
+FetchContent_Declare(
+  rapidjson
+  GIT_REPOSITORY https://github.com/Tencent/rapidjson.git
+  GIT_SHALLOW    ON
+#  GIT_TAG        v1.1.0
+)
+FetchContent_GetProperties(rapidjson)
+if(NOT rapidjson_POPULATED)
+    FetchContent_Populate(rapidjson)
+endif()
+# END rapidjson
+
 # installed with vcpkg - keep before other deps
 # find_package(google_cloud_cpp_bigtable CONFIG REQUIRED)
 find_package(libwebsockets CONFIG REQUIRED)
