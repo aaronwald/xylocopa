@@ -37,3 +37,11 @@ target_include_directories(bug PRIVATE ${MOSQUITTO_INCLUDE_DIRS})
 target_include_directories(bug PRIVATE ${rapidjson_SOURCE_DIR}/include)
 target_link_libraries(bug PRIVATE ${MOSQUITTO_LIBRARIES} OpenSSL::SSL OpenSSL::Crypto)
 # END mosquitto
+
+# BEGIN mosquitto
+find_package(mosquitto REQUIRED)
+add_executable(send "src/main/mqttsend.cpp")
+target_include_directories(send PRIVATE ${MOSQUITTO_INCLUDE_DIRS})
+target_include_directories(send PRIVATE ${rapidjson_SOURCE_DIR}/include)
+target_link_libraries(send PRIVATE ${MOSQUITTO_LIBRARIES} OpenSSL::SSL OpenSSL::Crypto)
+# END mosquitto

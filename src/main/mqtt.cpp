@@ -111,7 +111,7 @@ int main(int argc, char **argv)
   mosquitto_connect_callback_set(mosq, on_connect);
 
   // Subscribe to any channel that ends with ambient_data
-  mosquitto_subscribe(mosq, NULL, "rtl_433/#", 0);
+  mosquitto_subscribe(mosq, NULL, "foo/#", 0);
   if (mosquitto_loop_start(mosq) != MOSQ_ERR_SUCCESS)
   {
     std::cerr << "Error: failed to start mosquitto loop" << std::endl;
