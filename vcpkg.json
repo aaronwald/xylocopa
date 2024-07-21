@@ -1,0 +1,8 @@
+{
+    "dependencies": [
+      "libwebsockets",
+      "openssl",
+      "libyaml",
+      "mosquitto"
+    ]
+  }
