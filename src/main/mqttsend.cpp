@@ -19,7 +19,7 @@ void mosq_cleanup(mosquitto *mosq)
 
 void on_publish(struct mosquitto *, void *, int mid)
 {
-  std::cout << "Published message id: " << mid << std::endl;
+  std::cout << "OnPublished message id: " << mid << std::endl;
 }
 
 // https://mosquitto.org/api/files/mosquitto-h.html
@@ -95,17 +95,18 @@ int main(int argc, char **argv)
 
   mosquitto_publish_callback_set(mosq, on_publish);
   mosquitto_connect_callback_set(mosq, on_connect);
-
   ss << "{" << "\"time\": \"" << time(nullptr) << "\"}";
 
   int mid = -1;
-  if (mosquitto_publish(mosq, &mid, "foo/bar", ss.str().length(), ss.str().c_str(), 0, false) != MOSQ_ERR_SUCCESS) 
+  if (mosquitto_publish(mosq, &mid, "foo", ss.str().length(), ss.str().c_str(), 0, false) != MOSQ_ERR_SUCCESS)
   {
     std::cerr << "Publish failed" << std::endl;
-  } else {
-    std::cerr << "Publishded message id: " << mid << std::endl;
   }
-   
+  else
+  {
+    std::cerr << "Published message id: " << mid << std::endl;
+  }
+
   mosq_cleanup(mosq);
 
   return 0;
