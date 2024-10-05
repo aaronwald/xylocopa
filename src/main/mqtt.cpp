@@ -150,5 +150,5 @@ int main(int argc, char **argv)
 
 void usage(char **argv)
 {
-  fprintf(stderr, "Usage: %s [-h] [-s host] [-u user] [-p password]\n", argv[0]);
+  fprintf(stderr, "Usage: %s [-h] [-s host] [-u user] [-p password] [-t topic]\n", argv[0]);
 }
