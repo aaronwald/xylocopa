@@ -1,6 +1,9 @@
 #include <iostream>
 #include <thread>
 #include <unistd.h>
+#include <fmt/core.h>
+#include <fmt/color.h>
+
 #include "mosquitto.h"
 #include "mqtt.h"
 
@@ -18,7 +21,7 @@ void my_thread(void *, bool &done)
 
 void on_connect(struct mosquitto *, void *, int)
 {
-  std::cout << "Connected" << std::endl;
+  fmt::print(fg(fmt::color::green) | fmt::emphasis::bold, "Connected!\n");
 }
 
 void mosq_cleanup(mosquitto *mosq)
@@ -34,10 +37,12 @@ void on_message(struct mosquitto *, void *, const struct mosquitto_message *mess
 
   Document jd;
   jd.Parse(reinterpret_cast<char *>(message->payload), message->payloadlen);
-  if (jd.HasMember("time") && jd["time"].IsString())
-    std::cout << message->topic << " time " << jd["time"].GetString() << std::endl;
-  else
-    std::cout << "No time" << std::endl;
+  if (jd.HasMember("time")){
+    fmt::print(fg(fmt::color::yellow) | fmt::emphasis::bold, "time {}\n", jd["time"].GetString());
+  } else {
+    std::string s (reinterpret_cast<char *>(message->payload), message->payloadlen);
+    fmt::print(fg(fmt::color::crimson) | fmt::emphasis::bold, "debug {}\n", s.c_str());
+  }
 }
 
 // https://mosquitto.org/api/files/mosquitto-h.html
@@ -82,7 +87,7 @@ int main(int argc, char **argv)
   }
 
   mosquitto_lib_version(&major, &minor, &revision);
-  std::cout << "Libmosquitto version: " << major << "." << minor << "." << revision << std::endl;
+  fmt::print(fg(fmt::color::cyan) | fmt::emphasis::bold, "Libmosquitto version {}.{}.{}!\n", major, minor, revision);
 
   if (mosquitto_lib_init() != MOSQ_ERR_SUCCESS)
   {

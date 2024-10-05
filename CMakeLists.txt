@@ -27,6 +27,7 @@ find_package(libwebsockets CONFIG REQUIRED)
 find_package(OpenSSL REQUIRED)
 find_package(yaml CONFIG REQUIRED)
 find_package(mosquitto REQUIRED)
+find_package(fmt CONFIG REQUIRED)
 
 # end finds (before fetchcontent)
 
@@ -35,7 +36,7 @@ find_package(mosquitto REQUIRED)
 add_executable(bug "src/main/mqtt.cpp")
 target_include_directories(bug PRIVATE ${MOSQUITTO_INCLUDE_DIRS})
 target_include_directories(bug PRIVATE ${rapidjson_SOURCE_DIR}/include)
-target_link_libraries(bug PRIVATE ${MOSQUITTO_LIBRARIES} OpenSSL::SSL OpenSSL::Crypto)
+target_link_libraries(bug PRIVATE ${MOSQUITTO_LIBRARIES} OpenSSL::SSL OpenSSL::Crypto fmt::fmt)
 # END mosquitto
 
 # BEGIN mosquitto
@@ -43,5 +44,5 @@ find_package(mosquitto REQUIRED)
 add_executable(send "src/main/mqttsend.cpp")
 target_include_directories(send PRIVATE ${MOSQUITTO_INCLUDE_DIRS})
 target_include_directories(send PRIVATE ${rapidjson_SOURCE_DIR}/include)
-target_link_libraries(send PRIVATE ${MOSQUITTO_LIBRARIES} OpenSSL::SSL OpenSSL::Crypto)
+target_link_libraries(send PRIVATE ${MOSQUITTO_LIBRARIES} OpenSSL::SSL OpenSSL::Crypto fmt::fmt)
 # END mosquitto

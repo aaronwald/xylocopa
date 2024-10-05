@@ -3,6 +3,7 @@
       "libwebsockets",
       "openssl",
       "libyaml",
-      "mosquitto"
+      "mosquitto",
+      "fmt"
     ]
-  }
+}

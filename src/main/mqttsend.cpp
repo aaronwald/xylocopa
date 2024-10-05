@@ -98,7 +98,7 @@ int main(int argc, char **argv)
   ss << "{" << "\"time\": \"" << time(nullptr) << "\"}";
 
   int mid = -1;
-  if (mosquitto_publish(mosq, &mid, "foo", ss.str().length(), ss.str().c_str(), 0, false) != MOSQ_ERR_SUCCESS)
+  if (mosquitto_publish(mosq, &mid, "foo/bar", ss.str().length(), ss.str().c_str(), 0, false) != MOSQ_ERR_SUCCESS)
   {
     std::cerr << "Publish failed" << std::endl;
   }
