@@ -34,7 +34,10 @@ void on_message(struct mosquitto *, void *, const struct mosquitto_message *mess
 
   Document jd;
   jd.Parse(reinterpret_cast<char *>(message->payload), message->payloadlen);
-  std::cout << message->topic << " time " << jd["time"].GetString() << std::endl;
+  if (jd.HasMember("time") && jd["time"].IsString())
+    std::cout << message->topic << " time " << jd["time"].GetString() << std::endl;
+  else
+    std::cout << "No time" << std::endl;
 }
 
 // https://mosquitto.org/api/files/mosquitto-h.html
@@ -47,8 +50,9 @@ int main(int argc, char **argv)
   std::string hostname;
   std::string username;
   std::string password;
+  std::string topic;
 
-  while ((opt = getopt(argc, argv, "hs:u:p:")) != -1)
+  while ((opt = getopt(argc, argv, "hs:u:p:t:")) != -1)
   { // for each option...
     switch (opt)
     {
@@ -65,10 +69,13 @@ int main(int argc, char **argv)
     case 'p':
       password = std::string(optarg);
       break;
+    case 't':
+      topic = std::string(optarg);
+      break;
     }
   }
 
-  if (username.empty() || password.empty() || hostname.empty())
+  if (username.empty() || password.empty() || hostname.empty() || topic.empty())
   {
     usage(argv);
     exit(EXIT_FAILURE);
@@ -110,8 +117,9 @@ int main(int argc, char **argv)
   mosquitto_message_callback_set(mosq, on_message);
   mosquitto_connect_callback_set(mosq, on_connect);
 
+  std::cout << "Subscribing to topic: " << topic << std::endl;
   // Subscribe to any channel that ends with ambient_data
-  mosquitto_subscribe(mosq, NULL, "foo/#", 0);
+  mosquitto_subscribe(mosq, NULL, topic.c_str(), 0);
   if (mosquitto_loop_start(mosq) != MOSQ_ERR_SUCCESS)
   {
     std::cerr << "Error: failed to start mosquitto loop" << std::endl;
