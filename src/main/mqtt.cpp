@@ -26,13 +26,12 @@ void my_thread(void *, bool &done)
 
 void on_connect(struct mosquitto *mosq, void *ud, int)
 {
-  fmt::print(fg(fmt::color::green) | fmt::emphasis::bold, "Connected!\n");
-
   struct mqtt_ud *mud = reinterpret_cast<struct mqtt_ud *>(ud);
 
   std::cout << "Subscribing to topic: " << mud->topic << std::endl;
   // Subscribe to any channel that ends with ambient_data
   mosquitto_subscribe(mosq, NULL, mud->topic.c_str(), 0);
+  fmt::print(fg(fmt::color::green) | fmt::emphasis::bold, "On Connect!\n");
 }
 
 void mosq_cleanup(mosquitto *mosq)
@@ -43,7 +42,8 @@ void mosq_cleanup(mosquitto *mosq)
 
 void on_message(struct mosquitto *, void *, const struct mosquitto_message *message)
 {
-  // std::string json_payload(reinterpret_cast<char *>(message->payload), message->payloadlen);
+  std::string json_payload(reinterpret_cast<char *>(message->payload), message->payloadlen);
+  std::cout << "Received message: " << json_payload << std::endl;
   // push (copy?)
 
   Document jd;
