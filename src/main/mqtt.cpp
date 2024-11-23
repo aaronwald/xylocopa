@@ -14,14 +14,25 @@
 
 using namespace rapidjson;
 
+struct mqtt_ud
+{
+  std::string topic;
+};
+
 void my_thread(void *, bool &done)
 {
   // pop (free copy?)
 }
 
-void on_connect(struct mosquitto *, void *, int)
+void on_connect(struct mosquitto *mosq, void *ud, int)
 {
   fmt::print(fg(fmt::color::green) | fmt::emphasis::bold, "Connected!\n");
+
+  struct mqtt_ud *mud = reinterpret_cast<struct mqtt_ud *>(ud);
+
+  std::cout << "Subscribing to topic: " << mud->topic << std::endl;
+  // Subscribe to any channel that ends with ambient_data
+  mosquitto_subscribe(mosq, NULL, mud->topic.c_str(), 0);
 }
 
 void mosq_cleanup(mosquitto *mosq)
@@ -37,10 +48,13 @@ void on_message(struct mosquitto *, void *, const struct mosquitto_message *mess
 
   Document jd;
   jd.Parse(reinterpret_cast<char *>(message->payload), message->payloadlen);
-  if (jd.HasMember("time")){
+  if (jd.HasMember("time"))
+  {
     fmt::print(fg(fmt::color::yellow) | fmt::emphasis::bold, "time {}\n", jd["time"].GetString());
-  } else {
-    std::string s (reinterpret_cast<char *>(message->payload), message->payloadlen);
+  }
+  else
+  {
+    std::string s(reinterpret_cast<char *>(message->payload), message->payloadlen);
     fmt::print(fg(fmt::color::crimson) | fmt::emphasis::bold, "debug {}\n", s.c_str());
   }
 }
@@ -50,6 +64,7 @@ int main(int argc, char **argv)
 {
   int major, minor, revision;
   struct mosquitto *mosq = NULL;
+  struct mqtt_ud ud = {};
 
   int opt;
   std::string hostname;
@@ -95,7 +110,8 @@ int main(int argc, char **argv)
     exit(EXIT_FAILURE);
   }
 
-  mosq = mosquitto_new(NULL, true, nullptr);
+  ud.topic = topic;
+  mosq = mosquitto_new(NULL, true, &ud);
   if (!mosq)
   {
     std::cerr << "Error: failed to create mosquitto client" << std::endl;
@@ -122,9 +138,6 @@ int main(int argc, char **argv)
   mosquitto_message_callback_set(mosq, on_message);
   mosquitto_connect_callback_set(mosq, on_connect);
 
-  std::cout << "Subscribing to topic: " << topic << std::endl;
-  // Subscribe to any channel that ends with ambient_data
-  mosquitto_subscribe(mosq, NULL, topic.c_str(), 0);
   if (mosquitto_loop_start(mosq) != MOSQ_ERR_SUCCESS)
   {
     std::cerr << "Error: failed to start mosquitto loop" << std::endl;
